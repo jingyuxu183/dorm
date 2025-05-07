@@ -1,0 +1,72 @@
+# 环境变量和敏感信息文件
+.env
+.env.*
+!.env.example
+
+# Python虚拟环境
+venv/
+env/
+.venv/
+.Python
+.python-version
+
+# Python缓存文件
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 向量数据库文件
+knowledge_base/
+/knowledge_base/
+
+# 日志文件
+*.log
+logs/
+
+# IDE文件
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 临时文件
+tmp/
+temp/ 
+node_modules
+
+# 新增的代码块
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.railway/

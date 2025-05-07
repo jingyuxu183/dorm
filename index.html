@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宿舍费用查询系统 - 住宿人员界面</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+            font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+        }
+        .header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 20px;
+            text-align: center;
+        }
+        .query-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .answer-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: none;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .source-container {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            border: 1px solid #e9ecef;
+        }
+        .calculation-container {
+            background-color: #f0f7ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            border: 1px solid #cfe2ff;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        #answerText {
+            white-space: pre-line;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .fee-amount {
+            font-weight: bold;
+            color: #dc3545;
+        }
+        .query-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #0d6efd;
+        }
+        .user-instructions {
+            color: #6c757d;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>宿舍费用查询系统</h1>
+            <p class="text-muted">快速查询您的宿舍费用信息</p>
+        </div>
+        
+        <div class="query-container">
+            <h3 class="query-title">费用查询</h3>
+            <p class="user-instructions">请输入您的姓名进行查询，例如：张三</p>
+            
+            <form id="queryForm">
+                <div class="mb-4">
+                    <input type="text" class="form-control form-control-lg text-center" id="queryInput" placeholder="请输入您的姓名" required>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg" id="queryBtn">查询费用</button>
+                </div>
+            </form>
+            
+            <div class="alert mt-4" id="queryMessage" style="display: none;"></div>
+        </div>
+        
+        <div class="answer-container" id="answerContainer">
+            <h3 class="text-center mb-4">查询结果</h3>
+            <div class="loader" id="queryLoader"></div>
+            <div id="answerText" class="px-2"></div>
+            
+            <div class="calculation-container" id="calculationContainer" style="display: none;">
+                <h5>计算过程</h5>
+                <div id="calculationText" style="white-space: pre-line;"></div>
+            </div>
+            
+            <div class="source-container" id="sourceContainer">
+                <h5>数据来源</h5>
+                <div id="sourceText" style="white-space: pre-line;"></div>
+            </div>
+            
+            <div class="d-grid gap-2 mt-4">
+                <button class="btn btn-outline-primary" id="newQueryBtn">新的查询</button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 智宿系统 v1.0</p>
+        </div>
+    </div>
+
+    <script>
+        // 后端API地址
+        const API_BASE_URL = '';
+        
+        // 获取元素
+        const queryForm = document.getElementById('queryForm');
+        const queryInput = document.getElementById('queryInput');
+        const queryMessage = document.getElementById('queryMessage');
+        const answerContainer = document.getElementById('answerContainer');
+        const answerText = document.getElementById('answerText');
+        const queryLoader = document.getElementById('queryLoader');
+        const sourceText = document.getElementById('sourceText');
+        const sourceContainer = document.getElementById('sourceContainer');
+        const calculationText = document.getElementById('calculationText');
+        const calculationContainer = document.getElementById('calculationContainer');
+        const newQueryBtn = document.getElementById('newQueryBtn');
+        
+        // 查询处理
+        queryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const query = queryInput.value.trim();
+            if (!query) {
+                showMessage('error', '请输入姓名');
+                return;
+            }
+            
+            // 构建查询
+            let queryText = query;
+            if (!queryText.includes('费用') && !queryText.includes('租金') && !queryText.includes('水电')) {
+                queryText += '的宿舍费用';
+            }
+            
+            // 显示加载动画
+            answerContainer.style.display = 'block';
+            queryLoader.style.display = 'block';
+            answerText.style.display = 'none';
+            sourceContainer.style.display = 'none';
+            calculationContainer.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/query`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: queryText })
+                });
+                
+                const result = await response.json();
+                
+                // 隐藏加载动画
+                queryLoader.style.display = 'none';
+                answerText.style.display = 'block';
+                
+                if (response.ok) {
+                    // 显示回答
+                    answerText.innerHTML = formatAnswer(result.answer);
+                    
+                    // 显示计算过程（如果有）
+                    if (result.calculation_process) {
+                        calculationText.textContent = result.calculation_process;
+                        calculationContainer.style.display = 'block';
+                    } else {
+                        calculationContainer.style.display = 'none';
+                    }
+                    
+                    // 显示源文档
+                    if (result.source_documents) {
+                        sourceText.textContent = result.source_documents;
+                        sourceContainer.style.display = 'block';
+                    } else {
+                        sourceContainer.style.display = 'none';
+                    }
+                    
+                    // 隐藏查询表单
+                    document.querySelector('.query-container').style.display = 'none';
+                    
+                    // 清除任何可能的错误消息
+                    queryMessage.style.display = 'none';
+                } else {
+                    // 显示错误消息
+                    answerContainer.style.display = 'none';
+                    document.querySelector('.query-container').style.display = 'block';
+                    showMessage('error', `查询失败: ${result.error}`);
+                }
+            } catch (error) {
+                // 隐藏加载动画
+                queryLoader.style.display = 'none';
+                answerContainer.style.display = 'none';
+                
+                // 显示错误消息
+                showMessage('error', `请求出错: ${error.message}`);
+                console.error('Query error:', error);
+            }
+        });
+        
+        // 新查询按钮
+        newQueryBtn.addEventListener('click', () => {
+            // 显示查询表单
+            document.querySelector('.query-container').style.display = 'block';
+            // 隐藏结果
+            answerContainer.style.display = 'none';
+            // 清空输入
+            queryInput.value = '';
+        });
+        
+        // 显示消息提示
+        function showMessage(type, message) {
+            queryMessage.style.display = 'block';
+            
+            switch (type) {
+                case 'success':
+                    queryMessage.className = 'alert alert-success mt-4';
+                    break;
+                case 'error':
+                    queryMessage.className = 'alert alert-danger mt-4';
+                    break;
+                case 'info':
+                    queryMessage.className = 'alert alert-info mt-4';
+                    break;
+                default:
+                    queryMessage.className = 'alert alert-secondary mt-4';
+            }
+            
+            queryMessage.textContent = message;
+        }
+        
+        // 格式化答案，突出显示费用金额
+        function formatAnswer(text) {
+            // 对金额进行高亮处理
+            return text.replace(/(\d+(\.\d+)?(元|¥|￥))/g, '<span class="fee-amount">$1</span>');
+        }
+    </script>
+</body>
+</html> 

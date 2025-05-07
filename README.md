@@ -1,6 +1,45 @@
-# 宿舍费用管理系统
+# 宿舍费用查询系统
 
-一个简单易用的宿舍费用管理和查询系统，支持管理员上传Excel数据文件和住宿人员通过姓名查询费用信息。
+## 项目介绍
+该项目是一个基于Flask的宿舍费用查询系统，通过上传Excel文件，可以自动识别并解析宿舍费用信息，支持用户按姓名查询费用详情。系统基于向量数据库和大语言模型，自动适应各种格式的Excel文件。
+
+## 部署指南
+
+### Railway部署
+1. 在Railway平台创建新项目
+2. 导入GitHub仓库
+3. 添加以下环境变量:
+   - `DEEPSEEK_API_KEY`: DeepSeek API密钥
+   - `CHROMA_PERSIST_DIRECTORY`: `./knowledge_base`
+   - `PORT`: `5000`
+4. 设置健康检查路径为: `/status`
+5. 点击部署按钮
+
+### 本地开发
+1. 克隆仓库
+2. 创建虚拟环境: `python -m venv venv`
+3. 激活虚拟环境: 
+   - Windows: `venv\Scripts\activate`
+   - Linux/Mac: `source venv/bin/activate`
+4. 安装依赖: `pip install -r requirements.txt`
+5. 创建`.env`文件并添加必要环境变量
+6. 启动后端: `python backend.py`
+7. 访问: `http://localhost:5000`
+
+## 项目文件说明
+- `backend.py`: 主要后端应用程序
+- `index.html`: 用户查询页面
+- `admin.html`: 管理员上传页面
+- `requirements.txt`: 项目依赖
+- `Procfile`: Railway部署配置
+- `railway.toml`: Railway配置文件
+- `runtime.txt`: Python版本配置
+
+## 使用方法
+1. 访问管理页面 `/admin.html` 上传Excel文件
+2. 系统自动解析文件并提取信息
+3. 访问主页查询界面输入姓名进行查询
+4. 系统返回该学生的费用详情
 
 ## 功能特点
 
@@ -15,71 +54,6 @@
 - **前端**：纯HTML/CSS/JavaScript实现，无需额外框架
 - **后端**：Flask + LangChain + Chroma向量数据库
 - **AI集成**：大语言模型API用于自然语言处理和费用计算
-
-## 安装指南
-
-### 后端安装
-
-1. 克隆代码库
-```bash
-git clone [仓库地址]
-cd [项目目录]
-```
-
-2. 创建并激活虚拟环境
-```bash
-python -m venv venv
-# Windows
-venv\Scripts\activate
-# Linux/MacOS
-source venv/bin/activate
-```
-
-3. 安装依赖
-```bash
-pip install -r requirements.txt
-```
-
-4. 配置环境变量
-```bash
-cp .env.example .env
-# 编辑.env文件，填入您的API密钥
-```
-
-5. 启动后端服务
-```bash
-python backend.py
-```
-
-### 前端部署
-
-前端为纯静态文件，可以通过以下方式部署：
-
-1. 使用Python内置HTTP服务器（开发环境）
-```bash
-python -m http.server [端口号]
-```
-
-2. 或使用任何静态文件服务器（生产环境）
-```bash
-# 例如使用Nginx或Apache配置静态文件服务
-```
-
-## 使用指南
-
-### 管理员操作流程
-
-1. 访问登录页面，选择"管理员入口"
-2. 完成身份验证
-3. 上传包含宿舍费用信息的Excel文件
-4. 预览并确认数据正确
-5. 检查系统状态，确保数据已更新
-
-### 住宿人员查询流程
-
-1. 访问登录页面，选择"住宿人员入口"
-2. 在查询界面输入姓名
-3. 查看费用信息和计算过程
 
 ## 技术栈
 

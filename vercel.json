@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "*.html", "use": "@vercel/static" },
+    { "src": "*.css", "use": "@vercel/static" },
+    { "src": "*.js", "use": "@vercel/static" },
+    { "src": "backend.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/upload", "dest": "/backend.py" },
+    { "src": "/query", "dest": "/backend.py" },
+    { "src": "/clear", "dest": "/backend.py" },
+    { "src": "/status", "dest": "/backend.py" },
+    { "src": "/preview", "dest": "/backend.py" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+} 
