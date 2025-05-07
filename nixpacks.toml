@@ -1,0 +1,14 @@
+[phases.setup]
+nixPkgs = ["python39", "gcc"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt"]
+
+[phases.build]
+cmds = ["echo 'Python only build'"]
+
+[start]
+cmd = "python backend.py"
+
+[nixpacks]
+features = { nodejs = false } 
