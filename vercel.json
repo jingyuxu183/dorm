@@ -1,17 +1,31 @@
 {
   "version": 2,
   "builds": [
-    { "src": "*.html", "use": "@vercel/static" },
-    { "src": "*.css", "use": "@vercel/static" },
-    { "src": "*.js", "use": "@vercel/static" },
-    { "src": "backend.py", "use": "@vercel/python" }
+    {
+      "src": "app.py",
+      "use": "@vercel/python",
+      "config": { 
+        "maxLambdaSize": "15mb",
+        "runtime": "python3.9",
+        "pythonRequirementsPath": "requirements-vercel.txt"
+      }
+    },
+    {
+      "src": "*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.css",
+      "use": "@vercel/static"
+    }
   ],
   "routes": [
-    { "src": "/upload", "dest": "/backend.py" },
-    { "src": "/query", "dest": "/backend.py" },
-    { "src": "/clear", "dest": "/backend.py" },
-    { "src": "/status", "dest": "/backend.py" },
-    { "src": "/preview", "dest": "/backend.py" },
-    { "src": "/(.*)", "dest": "/$1" }
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/(.*\\.(js|css|html|ico|svg|jpg|png))", "dest": "/$1" },
+    { "src": "/(.*)", "dest": "/app.py" }
   ]
 } 
